@@ -39,8 +39,8 @@ def clean_data(df):
     
     
 def save_data(df, database_filename):
-    engine = create_engine('sqlite:///DisasterResponse_clean.db')
-    df.to_sql(database_filename, engine, index=False, if_exists='replace')  
+    engine = create_engine('sqlite:///{}.db'.format(database_filename))
+    df.to_sql('messages_categories_clean', engine, index=False, if_exists='replace')  
 
 
 def main():

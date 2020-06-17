@@ -36,6 +36,7 @@ model = joblib.load("../models/train_classifier.pkl")
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
+
 def index():
     
     # extract data needed for visuals
@@ -69,6 +70,83 @@ def index():
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+    
+    
+    # extract data needed for visuals
+    # TODO: Below is an example - modify to extract data for your own visuals
+    genre_counts = df.groupby('genre').count()['message']
+    genre_names = list(genre_counts.index)
+    
+    categories_count = df.iloc[:, 4:].sum(axis=0).reset_index()
+    categories_count.columns = ['category', 'count']
+    categories_count = categories_count.sort_values(by='count', ascending=False)
+    
+    # create visuals
+    # TODO: Below is an example - modify to create your own visuals
+    graphs = [
+        {
+            'data': [
+                Bar(
+                    x=categories_count['category'].head(),
+                    y=categories_count['count'].head()
+                )
+            ],
+
+            'layout': {
+                'title': 'Most Popular Categoires',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
+        
+        {
+            'data': [
+                Bar(
+                    x=categories_count['category'].tail(),
+                    y=categories_count['count'].tail()
+                )
+            ],
+
+            'layout': {
+                'title': 'Least Popular Categoires',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
+        
+        {
+            'data': [
+                Bar(
+                    x=genre_names,
+                    y=genre_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message Genres',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Genre"
+                }
+            }
+        }
+    ]
+    
+    # encode plotly graphs in JSON
+    ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
+    graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+    
+    
     
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)

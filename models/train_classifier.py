@@ -4,11 +4,14 @@ import numpy as np
 
 from sqlalchemy import create_engine
 import nltk
+nltk.download(['punkt', 'wordnet'])
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.multioutput import MultiOutputClassifier
@@ -53,10 +56,30 @@ def build_model():
 #         'clf__estimator__min_samples_leaf':[1, 5, 10]
     }
 
-
     cv = GridSearchCV(pipeline, param_grid=parameters)
     
-    return cv
+    
+    
+    pipeline2 = Pipeline([
+        ('vect', CountVectorizer()),
+        ('tfidf', TfidfTransformer()),
+        ('chi2', SelectKBest(chi2, k=500)),
+        ('clf', MultiOutputClassifier(AdaBoostClassifier()))
+    ])
+    
+    
+    parameters2 = {
+        'vect__max_df': (0.5, 1.0),
+#         'vect__max_features': (None, 5000, 10000),
+#         'tfidf__use_idf': (True, False),
+#        'chi2__k': [500, 1000],
+#        'clf__estimator__n_estimators': [100, 200],
+    }
+
+    cv2 = GridSearchCV(pipeline2, param_grid=parameters2)
+    
+    
+    return cv2
     
 
 def evaluate_model(model, X_test, Y_test, category_names):

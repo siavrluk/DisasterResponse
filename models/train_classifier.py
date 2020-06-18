@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.multioutput import MultiOutputClassifier
 import pickle
@@ -70,16 +71,16 @@ def build_model():
     
     parameters2 = {
         'vect__max_df': (0.5, 1.0),
-#         'vect__max_features': (None, 5000, 10000),
-#         'tfidf__use_idf': (True, False),
-#        'chi2__k': [500, 1000],
-#        'clf__estimator__n_estimators': [100, 200],
+        'vect__max_features': (None, 5000, 10000),
+        'tfidf__use_idf': (True, False),
+       'chi2__k': [500, 1000],
+       'clf__estimator__n_estimators': [100, 200]
     }
 
     cv2 = GridSearchCV(pipeline2, param_grid=parameters2)
     
     
-    return cv2
+    return cv
     
 
 def evaluate_model(model, X_test, Y_test, category_names):
